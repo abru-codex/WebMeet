@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">Video Meetings Made Simple</h1>
+        <p class="hero-subtitle">Connect with anyone, anywhere with our secure and easy-to-use video conferencing platform</p>
+        <div class="d-flex justify-content-center">
+            <a href="@Url.Action("Create", "Meeting")" class="btn btn-light btn-lg me-3">Host a Meeting</a>
+            <a href="@Url.Action("Join", "Meeting")" class="btn btn-outline-light btn-lg">Join a Meeting</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row features-section">
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-camera-video"></i>
+                </div>
+                <h3 class="feature-title">Crystal Clear Video</h3>
+                <p class="feature-text">Experience high-quality video meetings with advanced compression technology for smooth calls even on lower bandwidth.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3 class="feature-title">Secure Meetings</h3>
+                <p class="feature-text">All meetings are protected with password options and end-to-end encryption for your privacy and security.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-chat-dots"></i>
+                </div>
+                <h3 class="feature-title">Built-in Chat</h3>
+                <p class="feature-text">Share messages, links, and communicate with participants in real-time during your meetings.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-light-blue shadow-sm p-4 mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Quick Join</h3>
+                <p>Enter a meeting ID to join an existing meeting instantly.</p>
+                <form asp-action="Join" asp-controller="Meeting" class="d-flex">
+                    <input type="text" class="form-control me-2" id="meetingId" name="meetingId" placeholder="Meeting ID" required />
+                    <button type="submit" class="btn btn-primary">Join</button>
+                </form>
+            </div>
+            <div class="col-md-4 d-flex align-items-center justify-content-center">
+                <a href="@Url.Action("Create", "Meeting")" class="btn btn-outline-primary">Schedule a Meeting</a>
+            </div>
+        </div>
+    </div>
+</div>

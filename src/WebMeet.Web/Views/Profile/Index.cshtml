@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+<h2>User Profile</h2>
+
+<div class="profile-container">
+    <h3>@Model.Name's Profile</h3>
+    <p>Email: @Model.Email</p>
+    <p>Joined on: @Model.JoinedDate.ToString("MMMM dd, yyyy")</p>
+
+    <h4>Meetings Hosted</h4>
+    <ul>
+        @foreach (var meeting in Model.HostedMeetings)
+        {
+            <li>
+                <a asp-controller="Meeting" asp-action="Room" asp-route-id="@meeting.Id">@meeting.Title</a>
+                - @meeting.StartTime.ToString("MMMM dd, yyyy HH:mm")
+            </li>
+        }
+    </ul>
+
+    <h4>Meetings Joined</h4>
+    <ul>
+        @foreach (var meeting in Model.JoinedMeetings)
+        {
+            <li>
+                <a asp-controller="Meeting" asp-action="Room" asp-route-id="@meeting.Id">@meeting.Title</a>
+                - @meeting.StartTime.ToString("MMMM dd, yyyy HH:mm")
+            </li>
+        }
+    </ul>
+</div>
+
+<a asp-controller="Account" asp-action="Logout">Logout</a>

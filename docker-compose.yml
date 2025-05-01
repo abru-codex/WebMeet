@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  web:
+    image: video-meeting-app
+    build:
+      context: ./src/VideoMeeting.Web
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Database=VideoMeetingDb;Username=postgres;Password=yourpassword
+    depends_on:
+      - db
+    networks:
+      - video-meeting-network
+
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=VideoMeetingDb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=yourpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - video-meeting-network
+
+networks:
+  video-meeting-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

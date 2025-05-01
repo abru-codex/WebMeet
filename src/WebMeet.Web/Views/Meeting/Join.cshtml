@@ -1,0 +1,57 @@
+@model VideoMeeting.Web.Models.ViewModels.JoinMeetingViewModel
+
+@{
+    ViewData["Title"] = "Join Meeting";
+}
+
+<div class="container">
+    <div class="meeting-form-container">
+        <h2 class="text-center mb-4">
+            <i class="bi bi-people-fill text-primary"></i> 
+            Join a Meeting
+        </h2>
+        
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form asp-action="Join" method="post">
+                    <div class="mb-4">
+                        <label asp-for="MeetingId" class="form-label">Meeting ID</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                            <input asp-for="MeetingId" class="form-control" placeholder="Enter meeting ID" />
+                        </div>
+                        <span asp-validation-for="MeetingId" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label">Meeting Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input asp-for="Password" class="form-control" type="password" placeholder="Enter meeting password" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right"></i> Join Meeting
+                        </button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Home
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <p>Don't have a meeting ID? <a asp-controller="Meeting" asp-action="Create" class="text-primary">Create your own meeting</a></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+

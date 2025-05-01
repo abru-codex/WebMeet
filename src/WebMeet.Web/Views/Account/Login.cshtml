@@ -1,0 +1,72 @@
+@model VideoMeeting.Web.Models.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container">
+    <div class="auth-container">
+        <h2 class="auth-title">
+            <i class="bi bi-box-arrow-in-right text-primary"></i>
+            Log In
+        </h2>
+        
+        <div class="card auth-card shadow-sm">
+            <div class="card-body">
+                <form asp-action="Login" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input asp-for="Password" class="form-control" type="password" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-4 form-check">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label">Remember me</label>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right"></i> Log In
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <p>Don't have an account? <a asp-controller="Account" asp-action="Register" class="auth-link">Sign up now</a></p>
+            <p><a href="#" class="auth-link">Forgot your password?</a></p>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <p class="text-muted">Or log in with</p>
+            <div class="d-flex justify-content-center gap-2">
+                <button class="btn btn-outline-secondary">
+                    <i class="bi bi-google"></i> Google
+                </button>
+                <button class="btn btn-outline-secondary">
+                    <i class="bi bi-microsoft"></i> Microsoft
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

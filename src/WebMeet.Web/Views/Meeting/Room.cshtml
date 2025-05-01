@@ -1,0 +1,243 @@
+@{
+    ViewData["Title"] = "Meeting Room";
+}
+
+<div class="container-fluid p-0">
+    <div class="meeting-header bg-white shadow-sm p-2 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <span class="badge bg-primary p-2 me-2">
+                <i class="bi bi-broadcast"></i> Live
+            </span>
+            <h5 class="mb-0">@(Model?.Title ?? "Meeting Room")</h5>
+        </div>
+        <div>
+            <span class="text-muted me-3">
+                <i class="bi bi-clock"></i> <span id="meeting-time">00:00:00</span>
+            </span>
+            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#infoPanel">
+                <i class="bi bi-info-circle"></i> Meeting Info
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-0">
+        <!-- Main video area -->
+        <div class="col-md-9">
+            <div class="p-3">
+                <div id="video-container" class="mb-3">
+                    <div class="video-wrapper local-video">
+                        <video id="localVideo" autoplay muted></video>
+                        <div class="video-overlay">
+                            <span>You</span>
+                            <div>
+                                <i class="bi bi-mic-mute"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="remoteVideos" class="remote-videos-container"></div>
+                </div>
+
+                <div class="meeting-controls">
+                    <button id="muteButton" class="control-btn">
+                        <i class="bi bi-mic-fill"></i>
+                    </button>
+                    <button id="videoButton" class="control-btn">
+                        <i class="bi bi-camera-video-fill"></i>
+                    </button>
+                    <button id="shareButton" class="control-btn">
+                        <i class="bi bi-display-fill"></i>
+                    </button>
+                    <button id="participantsButton" class="control-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#participantsPanel">
+                        <i class="bi bi-people-fill"></i>
+                    </button>
+                    <button id="chatButton" class="control-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#chatPanel">
+                        <i class="bi bi-chat-fill"></i>
+                    </button>
+                    <button id="leaveButton" class="control-btn leave">
+                        <i class="bi bi-telephone-x-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Panel (Offcanvas) -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="chatPanel" aria-labelledby="chatPanelLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="chatPanelLabel">Chat</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body p-0">
+                <div id="chat-container">
+                    <div id="messages">
+                        <div class="message received">
+                            <div class="message-content">Welcome to the meeting!</div>
+                            <div class="message-meta">System • Just now</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chatInput" class="form-control" placeholder="Type a message..." />
+                        <button id="sendButton" class="btn btn-primary">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participants Panel (Offcanvas) -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="participantsPanel" aria-labelledby="participantsPanelLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="participantsPanelLabel">Participants (1)</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="participants-list">
+                    <div class="participant d-flex justify-content-between align-items-center p-2 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div class="participant-avatar me-2 bg-primary text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>You (Host)</div>
+                        </div>
+                        <div>
+                            <i class="bi bi-mic-fill"></i>
+                            <i class="bi bi-camera-video-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meeting Info Panel (Offcanvas) -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="infoPanel" aria-labelledby="infoPanelLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="infoPanelLabel">Meeting Information</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <p>Share this information to invite others to the meeting.</p>
+                
+                <div class="mb-3">
+                    <label class="form-label">Meeting ID</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="@(Model?.Id.ToString() ?? "123-456-789")" readonly id="meetingIdField" />
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('meetingIdField')">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="@(Model?.Password ?? "********")" readonly id="passwordField" />
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('passwordField')">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Invite Link</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="@(Url.Action("Join", "Meeting", null, Context.Request.Scheme))" readonly id="inviteLinkField" />
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('inviteLinkField')">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <hr />
+                
+                <p>
+                    <strong>Host:</strong> @(User.Identity.Name ?? "Anonymous")<br />
+                    <strong>Started:</strong> @(Model?.StartTime.ToString("MMM dd, yyyy HH:mm") ?? DateTime.Now.ToString("MMM dd, yyyy HH:mm"))
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/webrtc.js"></script>
+    <script src="~/js/chat.js"></script>
+    <script>
+        // Meeting timer
+        let seconds = 0;
+        let minutes = 0;
+        let hours = 0;
+        
+        function updateMeetingTime() {
+            seconds++;
+            if (seconds >= 60) {
+                seconds = 0;
+                minutes++;
+                if (minutes >= 60) {
+                    minutes = 0;
+                    hours++;
+                }
+            }
+            
+            const timeString = 
+                (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + 
+                (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + 
+                (seconds > 9 ? seconds : "0" + seconds);
+            
+            document.getElementById('meeting-time').textContent = timeString;
+        }
+        
+        setInterval(updateMeetingTime, 1000);
+        
+        // Mute/unmute toggle
+        document.getElementById('muteButton').addEventListener('click', function() {
+            this.classList.toggle('mute');
+            const icon = this.querySelector('i');
+            if (this.classList.contains('mute')) {
+                icon.classList.remove('bi-mic-fill');
+                icon.classList.add('bi-mic-mute-fill');
+            } else {
+                icon.classList.remove('bi-mic-mute-fill');
+                icon.classList.add('bi-mic-fill');
+            }
+        });
+        
+        // Video on/off toggle
+        document.getElementById('videoButton').addEventListener('click', function() {
+            this.classList.toggle('video-off');
+            const icon = this.querySelector('i');
+            if (this.classList.contains('video-off')) {
+                icon.classList.remove('bi-camera-video-fill');
+                icon.classList.add('bi-camera-video-off-fill');
+            } else {
+                icon.classList.remove('bi-camera-video-off-fill');
+                icon.classList.add('bi-camera-video-fill');
+            }
+        });
+        
+        // Leave meeting
+        document.getElementById('leaveButton').addEventListener('click', function() {
+            if (confirm('Are you sure you want to leave this meeting?')) {
+                window.location.href = '/Home/Index';
+            }
+        });
+        
+        // Copy to clipboard function
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            document.execCommand('copy');
+            
+            const button = element.nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            // Show feedback
+            icon.classList.remove('bi-clipboard');
+            icon.classList.add('bi-clipboard-check');
+            
+            setTimeout(() => {
+                icon.classList.remove('bi-clipboard-check');
+                icon.classList.add('bi-clipboard');
+            }, 2000);
+        }
+    </script>
+}

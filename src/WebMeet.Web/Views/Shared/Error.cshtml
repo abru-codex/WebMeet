@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">Oops! Something went wrong.</h1>
+
+<div>
+    <h2 class="text-warning">An error occurred while processing your request.</h2>
+    <p>
+        If you need immediate assistance, please contact support.
+    </p>
+</div>
+
+@if (Model != null && Model.RequestId != null)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+    </p>
+}

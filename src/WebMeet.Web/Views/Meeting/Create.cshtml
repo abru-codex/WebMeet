@@ -1,0 +1,82 @@
+@model VideoMeeting.Web.Models.ViewModels.CreateMeetingViewModel
+
+@{
+    ViewData["Title"] = "Create Meeting";
+}
+
+<div class="container">
+    <div class="meeting-form-container">
+        <h2 class="text-center mb-4">
+            <i class="bi bi-calendar-plus text-primary"></i> 
+            Create a Meeting
+        </h2>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <input type="hidden" asp-for="HostId" value="@User.Identity.Name" />
+                    
+                    <div class="mb-4">
+                        <label asp-for="Title" class="form-label">Meeting Title</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-type"></i></span>
+                            <input asp-for="Title" class="form-control" placeholder="My Team Meeting" />
+                        </div>
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label">Meeting Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input asp-for="Password" class="form-control" type="password" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                        <div class="form-text">Set a password to secure your meeting.</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="StartTime" class="form-label">Start Time</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-clock"></i></span>
+                                <input asp-for="StartTime" class="form-control" type="datetime-local" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            </div>
+                            <span asp-validation-for="StartTime" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Duration" class="form-label">Duration (minutes)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-hourglass-split"></i></span>
+                                <input asp-for="Duration" class="form-control" value="60" />
+                            </div>
+                            <span asp-validation-for="Duration" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input asp-for="IsRecurring" class="form-check-input" />
+                            <label asp-for="IsRecurring" class="form-check-label">Recurring Meeting</label>
+                        </div>
+                        <div class="form-text">Enable this option if you want to use the same meeting ID for future meetings.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-camera-video-fill"></i> Create Meeting
+                        </button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Home
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
