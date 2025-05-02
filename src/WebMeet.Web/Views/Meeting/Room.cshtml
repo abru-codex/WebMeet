@@ -1,157 +1,246 @@
 @{
     ViewData["Title"] = "Meeting Room";
+    Layout = "_MeetingLayout";
 }
 
-<div class="container-fluid p-0">
-    <div class="meeting-header bg-white shadow-sm p-2 d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
-            <span class="badge bg-primary p-2 me-2">
-                <i class="bi bi-broadcast"></i> Live
-            </span>
-            <h5 class="mb-0">@(Model?.Title ?? "Meeting Room")</h5>
+<!-- Meeting Room Interface -->
+<div class="meeting-header">
+    <div class="d-flex align-items-center">
+        <span class="badge bg-danger me-2">
+            <i class="bi bi-broadcast"></i> Live
+        </span>
+        <h5 class="mb-0 meeting-title">@(Model?.Title ?? "Meeting Room")</h5>
+    </div>
+    <div class="d-flex align-items-center">
+        <span class="me-3">
+            <i class="bi bi-clock"></i> <span id="meeting-time">00:00:00</span>
+        </span>
+        <button class="btn btn-sm btn-outline-light" id="infoButton">
+            <i class="bi bi-info-circle"></i> Meeting Info
+        </button>
+    </div>
+</div>
+
+<div class="meeting-container">
+    <div class="video-grid-container">
+        <div id="video-grid">
+            <div class="video-wrapper local-video">
+                <video id="localVideo" autoplay muted playsinline></video>
+                <div class="video-controls">
+                    <button class="video-control-btn" id="pinLocalVideo">
+                        <i class="bi bi-pin-angle"></i>
+                    </button>
+                    <button class="video-control-btn" id="fullscreenLocalVideo">
+                        <i class="bi bi-fullscreen"></i>
+                    </button>
+                </div>
+                <div class="video-overlay">
+                    <span><i class="bi bi-person-circle me-1"></i> You</span>
+                    <div>
+                        <i class="bi bi-mic-fill me-2" id="localAudioIndicator"></i>
+                        <i class="bi bi-camera-video-fill" id="localVideoIndicator"></i>
+                    </div>
+                </div>
+            </div>
+            <div id="remoteVideos"></div>
         </div>
-        <div>
-            <span class="text-muted me-3">
-                <i class="bi bi-clock"></i> <span id="meeting-time">00:00:00</span>
-            </span>
-            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#infoPanel">
-                <i class="bi bi-info-circle"></i> Meeting Info
+    </div>
+    
+    <!-- Chat Panel (Slide-in from side on mobile) -->
+    <div id="chatPanel" class="chat-panel">
+        <div class="chat-header">
+            <h5 class="mb-0">Chat</h5>
+            <button class="btn-close btn-close-white" id="closeChatButton"></button>
+        </div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Type a message..." />
+            <button id="sendButton">
+                <i class="bi bi-send-fill"></i>
             </button>
         </div>
     </div>
+</div>
 
-    <div class="row g-0">
-        <!-- Main video area -->
-        <div class="col-md-9">
-            <div class="p-3">
-                <div id="video-container" class="mb-3">
-                    <div class="video-wrapper local-video">
-                        <video id="localVideo" autoplay muted playsinline></video>
-                        <div class="video-overlay">
-                            <span>You</span>
-                        </div>
-                    </div>
-                    <div id="remoteVideos" class="remote-videos-container"></div>
-                </div>
+<!-- Meeting Controls Bar -->
+<div class="meeting-controls">
+    <div class="control-btn-container">
+        <button id="muteButton" class="control-btn">
+            <i class="bi bi-mic-fill"></i>
+        </button>
+        <div class="control-tooltip">Mute / Unmute</div>
+    </div>
+    
+    <div class="control-btn-container">
+        <button id="videoButton" class="control-btn">
+            <i class="bi bi-camera-video-fill"></i>
+        </button>
+        <div class="control-tooltip">Camera On / Off</div>
+    </div>
+    
+    <div class="control-btn-container">
+        <button id="shareButton" class="control-btn">
+            <i class="bi bi-display-fill"></i>
+        </button>
+        <div class="control-tooltip">Share Screen</div>
+    </div>
+    
+    <div class="control-btn-container">
+        <button id="participantsButton" class="control-btn">
+            <i class="bi bi-people-fill"></i>
+        </button>
+        <div class="control-tooltip">Participants</div>
+    </div>
+    
+    <div class="control-btn-container">
+        <button id="chatToggle" class="control-btn">
+            <i class="bi bi-chat-fill"></i>
+        </button>
+        <div class="control-tooltip">Chat</div>
+    </div>
+    
+    <div class="control-btn-container">
+        <button id="settingsButton" class="control-btn">
+            <i class="bi bi-gear-fill"></i>
+        </button>
+        <div class="control-tooltip">Settings</div>
+    </div>
+    
+    <div class="control-btn-container">
+        <button id="leaveButton" class="control-btn leave">
+            <i class="bi bi-telephone-x-fill"></i>
+        </button>
+        <div class="control-tooltip">Leave Meeting</div>
+    </div>
+</div>
 
-                <div class="meeting-controls">
-                    <button id="muteButton" class="control-btn">
-                        <i class="bi bi-mic-fill"></i>
-                    </button>
-                    <button id="videoButton" class="control-btn">
-                        <i class="bi bi-camera-video-fill"></i>
-                    </button>
-                    <button id="shareButton" class="control-btn">
-                        <i class="bi bi-display-fill"></i>
-                    </button>
-                    <button id="participantsButton" class="control-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#participantsPanel">
-                        <i class="bi bi-people-fill"></i>
-                    </button>
-                    <button id="chatToggle" class="control-btn">
-                        <i class="bi bi-chat"></i>
-                    </button>
-                    <button id="leaveButton" class="control-btn leave">
-                        <i class="bi bi-telephone-x-fill"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Panel -->
-        <div id="chatPanel" class="col-md-3 chat-panel">
-            <div class="chat-header">
-                <h5>Chat</h5>
-                <button id="closeChatButton" class="btn-close"></button>
-            </div>
-            <div id="chatMessages" class="chat-messages"></div>
-            <div class="chat-input">
-                <input type="text" id="messageInput" class="form-control" placeholder="Type a message..." />
-                <button id="sendButton" class="btn btn-primary">
-                    <i class="bi bi-send"></i>
+<!-- Meeting Info Panel (Slide-in panel) -->
+<div id="infoPanel" class="side-panel">
+    <div class="panel-header">
+        <h5 class="mb-0">Meeting Information</h5>
+        <button class="btn-close btn-close-white" id="closeInfoButton"></button>
+    </div>
+    <div class="panel-body">
+        <p>Share this information to invite others to the meeting.</p>
+        
+        <div class="mb-3">
+            <label class="form-label">Meeting ID</label>
+            <div class="input-group">
+                <input type="text" class="form-control bg-dark text-white border-secondary" 
+                       value="@(Model?.Id.ToString() ?? "123-456-789")" readonly id="meetingIdField" />
+                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('meetingIdField')">
+                    <i class="bi bi-clipboard"></i>
                 </button>
             </div>
         </div>
-
-        <!-- Participants Panel (Offcanvas) -->
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="participantsPanel" aria-labelledby="participantsPanelLabel">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title" id="participantsPanelLabel">Participants</h5>
-                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-                <div id="participantsList" class="participants-list">
-                    <div class="participant d-flex justify-content-between align-items-center p-2 border-bottom">
-                        <div class="d-flex align-items-center">
-                            <div class="participant-avatar me-2 bg-primary text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;">
-                                <i class="bi bi-person-fill"></i>
-                            </div>
-                            <div>You @(Model?.HostId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ? "(Host)" : "")</div>
-                        </div>
-                        <div>
-                            <i class="bi bi-mic-fill"></i>
-                            <i class="bi bi-camera-video-fill"></i>
-                        </div>
-                    </div>
-                </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+                <input type="text" class="form-control bg-dark text-white border-secondary" 
+                       value="@(Model?.Password ?? "********")" readonly id="passwordField" />
+                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('passwordField')">
+                    <i class="bi bi-clipboard"></i>
+                </button>
             </div>
         </div>
-
-        <!-- Meeting Info Panel (Offcanvas) -->
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="infoPanel" aria-labelledby="infoPanelLabel">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title" id="infoPanelLabel">Meeting Information</h5>
-                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        
+        <div class="mb-3">
+            <label class="form-label">Invite Link</label>
+            <div class="input-group">
+                <input type="text" class="form-control bg-dark text-white border-secondary" 
+                       value="@(Url.Action("Join", "Meeting", new { id = Model?.Id }, Context.Request.Scheme))" 
+                       readonly id="inviteLinkField" />
+                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('inviteLinkField')">
+                    <i class="bi bi-clipboard"></i>
+                </button>
             </div>
-            <div class="offcanvas-body">
-                <p>Share this information to invite others to the meeting.</p>
-                
-                <div class="mb-3">
-                    <label class="form-label">Meeting ID</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" value="@(Model?.Id.ToString() ?? "123-456-789")" readonly id="meetingIdField" />
-                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('meetingIdField')">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
+        </div>
+        
+        <hr class="border-secondary" />
+        
+        <p>
+            <strong>Host:</strong> @(User.Identity?.Name ?? "Anonymous")<br />
+            <strong>Started:</strong> @(Model?.StartTime.ToString("MMM dd, yyyy HH:mm") ?? DateTime.Now.ToString("MMM dd, yyyy HH:mm"))
+        </p>
+    </div>
+</div>
+
+<!-- Participants Panel (Slide-in panel) -->
+<div id="participantsPanel" class="side-panel">
+    <div class="panel-header">
+        <h5 class="mb-0">Participants</h5>
+        <button class="btn-close btn-close-white" id="closeParticipantsButton"></button>
+    </div>
+    <div class="panel-body">
+        <div id="participantsList" class="participants-list">
+            <div class="participant d-flex justify-content-between align-items-center p-2 border-bottom border-secondary">
+                <div class="d-flex align-items-center">
+                    <div class="participant-avatar me-2 bg-primary text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;">
+                        <i class="bi bi-person-fill"></i>
                     </div>
+                    <div>You @(Model?.HostId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ? "(Host)" : "")</div>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" value="@(Model?.Password ?? "********")" readonly id="passwordField" />
-                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('passwordField')">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
+                <div>
+                    <i class="bi bi-mic-fill me-2"></i>
+                    <i class="bi bi-camera-video-fill"></i>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Invite Link</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" value="@(Url.Action("Join", "Meeting", null, Context.Request.Scheme))" readonly id="inviteLinkField" />
-                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('inviteLinkField')">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <hr />
-                
-                <p>
-                    <strong>Host:</strong> @(User.Identity.Name ?? "Anonymous")<br />
-                    <strong>Started:</strong> @(Model?.StartTime.ToString("MMM dd, yyyy HH:mm") ?? DateTime.Now.ToString("MMM dd, yyyy HH:mm"))
-                </p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Hidden input fields for SignalR to use -->
+<!-- Settings Panel (Slide-in panel) -->
+<div id="settingsPanel" class="side-panel">
+    <div class="panel-header">
+        <h5 class="mb-0">Settings</h5>
+        <button class="btn-close btn-close-white" id="closeSettingsButton"></button>
+    </div>
+    <div class="panel-body">
+        <div class="mb-3">
+            <label class="form-label">Audio Input</label>
+            <select id="audioInputSelect" class="form-select bg-dark text-white border-secondary"></select>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Video Input</label>
+            <select id="videoInputSelect" class="form-select bg-dark text-white border-secondary"></select>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Audio Output</label>
+            <select id="audioOutputSelect" class="form-select bg-dark text-white border-secondary"></select>
+        </div>
+        
+        <hr class="border-secondary" />
+        
+        <div class="mb-3">
+            <label class="form-label">Video Quality</label>
+            <select id="videoQualitySelect" class="form-select bg-dark text-white border-secondary">
+                <option value="low">Low (360p)</option>
+                <option value="medium" selected>Medium (480p)</option>
+                <option value="high">High (720p)</option>
+                <option value="hd">HD (1080p)</option>
+            </select>
+        </div>
+        
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="noiseSuppressionToggle" checked>
+            <label class="form-check-label" for="noiseSuppressionToggle">Noise Suppression</label>
+        </div>
+        
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="echoToggle" checked>
+            <label class="form-check-label" for="echoToggle">Echo Cancellation</label>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden input fields for SignalR -->
 <input type="hidden" id="meeting-id" value="@Model?.Id" />
-<input type="hidden" id="user-name" value="@User.Identity.Name" />
+<input type="hidden" id="user-name" value="@User.Identity?.Name" />
 
 @section Scripts {
-    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script src="~/js/webrtc.js"></script>
     <script src="~/js/chat.js"></script>
     <script>
@@ -181,12 +270,62 @@
         
         setInterval(updateMeetingTime, 1000);
         
-        // Close chat panel when close button is clicked
-        document.getElementById('closeChatButton')?.addEventListener('click', function() {
-            document.getElementById('chatPanel').classList.remove('chat-panel-visible');
-            const icon = document.getElementById('chatToggle').querySelector('i');
-            icon.classList.remove('bi-chat-fill');
-            icon.classList.add('bi-chat');
+        // Panel management
+        const chatPanel = document.getElementById('chatPanel');
+        const infoPanel = document.getElementById('infoPanel');
+        const participantsPanel = document.getElementById('participantsPanel');
+        const settingsPanel = document.getElementById('settingsPanel');
+        
+        function closeAllPanels() {
+            infoPanel.classList.remove('panel-visible');
+            participantsPanel.classList.remove('panel-visible');
+            settingsPanel.classList.remove('panel-visible');
+            
+            if (window.innerWidth <= 768) {
+                chatPanel.classList.remove('chat-panel-visible');
+            }
+        }
+        
+        // Chat panel toggle
+        document.getElementById('chatToggle').addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                closeAllPanels();
+                chatPanel.classList.toggle('chat-panel-visible');
+            }
+        });
+        
+        document.getElementById('closeChatButton').addEventListener('click', function() {
+            chatPanel.classList.remove('chat-panel-visible');
+        });
+        
+        // Info panel toggle
+        document.getElementById('infoButton').addEventListener('click', function() {
+            closeAllPanels();
+            infoPanel.classList.toggle('panel-visible');
+        });
+        
+        document.getElementById('closeInfoButton').addEventListener('click', function() {
+            infoPanel.classList.remove('panel-visible');
+        });
+        
+        // Participants panel toggle
+        document.getElementById('participantsButton').addEventListener('click', function() {
+            closeAllPanels();
+            participantsPanel.classList.toggle('panel-visible');
+        });
+        
+        document.getElementById('closeParticipantsButton').addEventListener('click', function() {
+            participantsPanel.classList.remove('panel-visible');
+        });
+        
+        // Settings panel toggle
+        document.getElementById('settingsButton').addEventListener('click', function() {
+            closeAllPanels();
+            settingsPanel.classList.toggle('panel-visible');
+        });
+        
+        document.getElementById('closeSettingsButton').addEventListener('click', function() {
+            settingsPanel.classList.remove('panel-visible');
         });
         
         // Copy to clipboard function
@@ -207,5 +346,63 @@
                 icon.classList.add('bi-clipboard');
             }, 2000);
         }
+        
+        // Device selection
+        if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+            navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const audioInputSelect = document.getElementById('audioInputSelect');
+                    const videoInputSelect = document.getElementById('videoInputSelect');
+                    const audioOutputSelect = document.getElementById('audioOutputSelect');
+                    
+                    // Clear existing options
+                    audioInputSelect.innerHTML = '';
+                    videoInputSelect.innerHTML = '';
+                    audioOutputSelect.innerHTML = '';
+                    
+                    // Populate device options
+                    devices.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || `${device.kind} (${device.deviceId.substring(0, 8)}...)`;
+                        
+                        if (device.kind === 'audioinput') {
+                            audioInputSelect.appendChild(option);
+                        } else if (device.kind === 'videoinput') {
+                            videoInputSelect.appendChild(option);
+                        } else if (device.kind === 'audiooutput') {
+                            audioOutputSelect.appendChild(option);
+                        }
+                    });
+                })
+                .catch(err => console.error("Error enumerating devices:", err));
+        }
+        
+        // Close panels when clicking outside
+        document.addEventListener('click', function(e) {
+            // Check if the click is outside panels and panel toggles
+            const isOutsideInfoPanel = !infoPanel.contains(e.target) && e.target.id !== 'infoButton' && !e.target.closest('#infoButton');
+            const isOutsideParticipantsPanel = !participantsPanel.contains(e.target) && e.target.id !== 'participantsButton' && !e.target.closest('#participantsButton');
+            const isOutsideSettingsPanel = !settingsPanel.contains(e.target) && e.target.id !== 'settingsButton' && !e.target.closest('#settingsButton');
+            
+            if (isOutsideInfoPanel && infoPanel.classList.contains('panel-visible')) {
+                infoPanel.classList.remove('panel-visible');
+            }
+            
+            if (isOutsideParticipantsPanel && participantsPanel.classList.contains('panel-visible')) {
+                participantsPanel.classList.remove('panel-visible');
+            }
+            
+            if (isOutsideSettingsPanel && settingsPanel.classList.contains('panel-visible')) {
+                settingsPanel.classList.remove('panel-visible');
+            }
+        });
+        
+        // Handle screen resize for responsive layout
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                chatPanel.classList.remove('chat-panel-visible');
+            }
+        });
     </script>
 }
