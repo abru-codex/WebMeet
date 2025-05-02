@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Logout";
+}
+
+<div class="container">
+    <div class="auth-container">
+        <h2 class="auth-title">
+            <i class="bi bi-box-arrow-right text-primary"></i>
+            Confirm Logout
+        </h2>
+        
+        <div class="card auth-card shadow-sm">
+            <div class="card-body">
+                <p class="mb-4">Are you sure you want to log out?</p>
+                
+                <form asp-action="LogoutConfirm" method="post">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-right"></i> Yes, Log Out
+                        </button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> No, Go Back
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

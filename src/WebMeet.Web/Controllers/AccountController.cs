@@ -70,10 +70,17 @@ namespace WebMeet.Web.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            return View();
+        }
+
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> LogoutConfirm()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");

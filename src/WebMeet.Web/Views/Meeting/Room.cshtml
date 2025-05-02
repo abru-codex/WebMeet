@@ -26,12 +26,9 @@
             <div class="p-3">
                 <div id="video-container" class="mb-3">
                     <div class="video-wrapper local-video">
-                        <video id="localVideo" autoplay muted></video>
+                        <video id="localVideo" autoplay muted playsinline></video>
                         <div class="video-overlay">
                             <span>You</span>
-                            <div>
-                                <i class="bi bi-mic-mute"></i>
-                            </div>
                         </div>
                     </div>
                     <div id="remoteVideos" class="remote-videos-container"></div>
@@ -50,8 +47,8 @@
                     <button id="participantsButton" class="control-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#participantsPanel">
                         <i class="bi bi-people-fill"></i>
                     </button>
-                    <button id="chatButton" class="control-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#chatPanel">
-                        <i class="bi bi-chat-fill"></i>
+                    <button id="chatToggle" class="control-btn">
+                        <i class="bi bi-chat"></i>
                     </button>
                     <button id="leaveButton" class="control-btn leave">
                         <i class="bi bi-telephone-x-fill"></i>
@@ -60,44 +57,35 @@
             </div>
         </div>
 
-        <!-- Chat Panel (Offcanvas) -->
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="chatPanel" aria-labelledby="chatPanelLabel">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title" id="chatPanelLabel">Chat</h5>
-                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <!-- Chat Panel -->
+        <div id="chatPanel" class="col-md-3 chat-panel">
+            <div class="chat-header">
+                <h5>Chat</h5>
+                <button id="closeChatButton" class="btn-close"></button>
             </div>
-            <div class="offcanvas-body p-0">
-                <div id="chat-container">
-                    <div id="messages">
-                        <div class="message received">
-                            <div class="message-content">Welcome to the meeting!</div>
-                            <div class="message-meta">System • Just now</div>
-                        </div>
-                    </div>
-                    <div class="chat-input-container">
-                        <input type="text" id="chatInput" class="form-control" placeholder="Type a message..." />
-                        <button id="sendButton" class="btn btn-primary">
-                            <i class="bi bi-send-fill"></i>
-                        </button>
-                    </div>
-                </div>
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-input">
+                <input type="text" id="messageInput" class="form-control" placeholder="Type a message..." />
+                <button id="sendButton" class="btn btn-primary">
+                    <i class="bi bi-send"></i>
+                </button>
             </div>
         </div>
 
         <!-- Participants Panel (Offcanvas) -->
         <div class="offcanvas offcanvas-end" tabindex="-1" id="participantsPanel" aria-labelledby="participantsPanelLabel">
             <div class="offcanvas-header">
-                <h5 class="offcanvas-title" id="participantsPanelLabel">Participants (1)</h5>
+                <h5 class="offcanvas-title" id="participantsPanelLabel">Participants</h5>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
-                <div class="participants-list">
+                <div id="participantsList" class="participants-list">
                     <div class="participant d-flex justify-content-between align-items-center p-2 border-bottom">
                         <div class="d-flex align-items-center">
                             <div class="participant-avatar me-2 bg-primary text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;">
                                 <i class="bi bi-person-fill"></i>
                             </div>
-                            <div>You (Host)</div>
+                            <div>You @(Model?.HostId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ? "(Host)" : "")</div>
                         </div>
                         <div>
                             <i class="bi bi-mic-fill"></i>
@@ -158,7 +146,12 @@
     </div>
 </div>
 
+<!-- Hidden input fields for SignalR to use -->
+<input type="hidden" id="meeting-id" value="@Model?.Id" />
+<input type="hidden" id="user-name" value="@User.Identity.Name" />
+
 @section Scripts {
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script src="~/js/webrtc.js"></script>
     <script src="~/js/chat.js"></script>
     <script>
@@ -188,37 +181,12 @@
         
         setInterval(updateMeetingTime, 1000);
         
-        // Mute/unmute toggle
-        document.getElementById('muteButton').addEventListener('click', function() {
-            this.classList.toggle('mute');
-            const icon = this.querySelector('i');
-            if (this.classList.contains('mute')) {
-                icon.classList.remove('bi-mic-fill');
-                icon.classList.add('bi-mic-mute-fill');
-            } else {
-                icon.classList.remove('bi-mic-mute-fill');
-                icon.classList.add('bi-mic-fill');
-            }
-        });
-        
-        // Video on/off toggle
-        document.getElementById('videoButton').addEventListener('click', function() {
-            this.classList.toggle('video-off');
-            const icon = this.querySelector('i');
-            if (this.classList.contains('video-off')) {
-                icon.classList.remove('bi-camera-video-fill');
-                icon.classList.add('bi-camera-video-off-fill');
-            } else {
-                icon.classList.remove('bi-camera-video-off-fill');
-                icon.classList.add('bi-camera-video-fill');
-            }
-        });
-        
-        // Leave meeting
-        document.getElementById('leaveButton').addEventListener('click', function() {
-            if (confirm('Are you sure you want to leave this meeting?')) {
-                window.location.href = '/Home/Index';
-            }
+        // Close chat panel when close button is clicked
+        document.getElementById('closeChatButton')?.addEventListener('click', function() {
+            document.getElementById('chatPanel').classList.remove('chat-panel-visible');
+            const icon = document.getElementById('chatToggle').querySelector('i');
+            icon.classList.remove('bi-chat-fill');
+            icon.classList.add('bi-chat');
         });
         
         // Copy to clipboard function

@@ -19,7 +19,7 @@ namespace WebMeet.Web.Services
             {
                 Id = Guid.NewGuid(),
                 HostId = model.HostId,
-                StartTime = model.StartTime,
+                StartTime = model.StartTime.ToUniversalTime(),
                 Password = model.Password,
                 Title = model.Title,
                 Duration = model.Duration,
