@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace VideoMeeting.Web.Controllers
+namespace WebMeet.Web.Controllers
 {
     public class HomeController : Controller
     {

@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace VideoMeeting.Web.Models
+namespace WebMeet.Web.Models
 {
     public class Meeting
     {

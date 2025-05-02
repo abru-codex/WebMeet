@@ -1,6 +1,4 @@
-using System;
-
-namespace VideoMeeting.Web.Models.ViewModels;
+namespace WebMeet.Web.Models.ViewModels;
 
 public class LoginViewModel
 {

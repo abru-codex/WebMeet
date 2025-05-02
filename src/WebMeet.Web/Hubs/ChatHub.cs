@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
 
-namespace VideoMeeting.Web.Hubs
+namespace WebMeet.Web.Hubs
 {
     public class ChatHub : Hub
     {

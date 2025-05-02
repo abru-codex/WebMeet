@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using VideoMeeting.Web.Models;
+using WebMeet.Web.Models;
 
-namespace VideoMeeting.Web.Data.Repositories
+namespace WebMeet.Web.Data.Repositories
 {
     public interface IMeetingRepository
     {

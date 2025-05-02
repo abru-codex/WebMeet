@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using VideoMeeting.Web.Models;
-using VideoMeeting.Web.Models.ViewModels;
+using WebMeet.Web.Models;
+using WebMeet.Web.Models.ViewModels;
 
-namespace VideoMeeting.Web.Controllers
+namespace WebMeet.Web.Controllers
 {
     [Authorize]
     public class AccountController : Controller

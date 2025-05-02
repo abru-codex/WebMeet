@@ -1,9 +1,9 @@
-using VideoMeeting.Web.Data;
-using VideoMeeting.Web.Data.Repositories;
-using VideoMeeting.Web.Models;
-using VideoMeeting.Web.Services;
-using VideoMeeting.Web.Hubs;
 using Microsoft.EntityFrameworkCore;
+using WebMeet.Web.Data;
+using WebMeet.Web.Data.Repositories;
+using WebMeet.Web.Hubs;
+using WebMeet.Web.Models;
+using WebMeet.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

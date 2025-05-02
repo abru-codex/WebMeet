@@ -1,7 +1,6 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
-namespace VideoMeeting.Web.Hubs
+namespace WebMeet.Web.Hubs
 {
     public class SignalingHub : Hub
     {

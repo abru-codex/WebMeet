@@ -1,6 +1,4 @@
-using System;
-
-namespace VideoMeeting.Web.Models
+namespace WebMeet.Web.Models
 {
     public class ErrorViewModel
     {

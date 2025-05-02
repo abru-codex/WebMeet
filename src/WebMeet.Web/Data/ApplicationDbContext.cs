@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using VideoMeeting.Web.Models;
+using WebMeet.Web.Models;
 
-namespace VideoMeeting.Web.Data
+namespace WebMeet.Web.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {

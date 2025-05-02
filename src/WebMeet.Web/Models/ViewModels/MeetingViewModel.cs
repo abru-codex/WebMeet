@@ -1,8 +1,4 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
-
-namespace VideoMeeting.Web.Models.ViewModels
+namespace WebMeet.Web.Models.ViewModels
 {
     public class MeetingViewModel
     {

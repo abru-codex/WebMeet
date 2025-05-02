@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using VideoMeeting.Web.Data;
-using VideoMeeting.Web.Models;
+using WebMeet.Web.Models;
 
-namespace VideoMeeting.Web.Data.Repositories
+namespace WebMeet.Web.Data.Repositories
 {
     public class MeetingRepository : IMeetingRepository
     {

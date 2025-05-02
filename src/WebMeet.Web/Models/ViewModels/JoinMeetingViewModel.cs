@@ -1,7 +1,6 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VideoMeeting.Web.Models.ViewModels
+namespace WebMeet.Web.Models.ViewModels
 {
     public class JoinMeetingViewModel
     {

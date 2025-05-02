@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>VideoMeeting.Web</RootNamespace>
-    <AssemblyName>VideoMeeting.Web</AssemblyName>
+    <RootNamespace>WebMeet.Web</RootNamespace>
+    <AssemblyName>WebMeet.Web</AssemblyName>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

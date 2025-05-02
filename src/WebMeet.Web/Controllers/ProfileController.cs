@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
-namespace VideoMeeting.Web.Controllers
+namespace WebMeet.Web.Controllers
 {
     [Authorize]
     public class ProfileController : Controller

@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using VideoMeeting.Web.Data.Repositories;
-using VideoMeeting.Web.Models;
-using VideoMeeting.Web.Models.ViewModels;
+using WebMeet.Web.Data.Repositories;
+using WebMeet.Web.Models;
+using WebMeet.Web.Models.ViewModels;
 
-namespace VideoMeeting.Web.Services
+namespace WebMeet.Web.Services
 {
     public class MeetingService : IMeetingService
     {
