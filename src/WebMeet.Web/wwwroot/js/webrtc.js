@@ -1,21 +1,21 @@
-// This file contains JavaScript for handling WebRTC functionality.
-
-// Initialize connection to SignalR hub for signaling
 const connection = new signalR.HubConnectionBuilder()
   .withUrl("/signalinghub")
   .build();
 
 let localStream;
 let peerConnections = {};
-let roomId;
+let remoteStreams = {};
+let webRTCRoomId;
 let localUserName;
 
-// ICE servers configuration with Google's public STUN server as specified in requirements
 const configuration = {
-  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  iceServers: [
+    {
+      urls: ["stun:stun1.1.google.com:19302", "stun:stun2.1.google.com:19302"],
+    },
+  ],
 };
 
-// Start the connection to the signaling hub
 connection
   .start()
   .then(() => {
@@ -24,31 +24,27 @@ connection
   })
   .catch((err) => console.error("Error connecting to SignalR hub:", err));
 
-// Set up local media stream when the page loads
 async function setupLocalMedia() {
   try {
-    // Get local video and audio stream
     localStream = await navigator.mediaDevices.getUserMedia({
       video: { width: 1280, height: 720 },
-      audio: true,
+      audio: false,
     });
 
-    // Display local video
     const localVideo = document.getElementById("localVideo");
     if (localVideo) {
       localVideo.srcObject = localStream;
     }
 
-    // Join room if room ID exists
     const urlParams = new URLSearchParams(window.location.search);
-    roomId =
+    webRTCRoomId =
       document.getElementById("meeting-id")?.value || urlParams.get("id");
     localUserName =
       document.getElementById("user-name")?.value ||
       "User" + Math.floor(Math.random() * 1000);
 
-    if (roomId) {
-      joinRoom(roomId, localUserName);
+    if (webRTCRoomId) {
+      joinRoom(webRTCRoomId, localUserName);
     }
   } catch (error) {
     console.error("Error accessing media devices:", error);
@@ -58,21 +54,18 @@ async function setupLocalMedia() {
   }
 }
 
-// Join a meeting room
-function joinRoom(roomId, userName) {
-  if (!roomId) {
+function joinRoom(webRTCRoomId, userName) {
+  if (!webRTCRoomId) {
     console.error("Room ID is required to join a room");
     return;
   }
 
-  // Join the room via SignalR
   connection
-    .invoke("JoinRoom", roomId, userName)
+    .invoke("JoinRoom", webRTCRoomId, userName)
     .catch((err) => console.error("Error joining room:", err));
 }
 
-// Handle new participant joining the room
-connection.on("participantJoined", (participantId, participantName) => {
+connection.on("participantJoined", async (participantId, participantName) => {
   console.log(`${participantName} joined the room`);
 
   // Create a new peer connection for this participant
@@ -84,35 +77,24 @@ connection.on("participantJoined", (participantId, participantName) => {
     peerConnection.addTrack(track, localStream);
   });
 
-  // Set up ICE candidate handling
-  peerConnection.onicecandidate = (event) => {
-    if (event.candidate) {
-      connection
-        .invoke(
-          "SendIceCandidate",
-          roomId,
-          participantId,
-          JSON.stringify(event.candidate)
-        )
-        .catch((err) => console.error("Error sending ICE candidate:", err));
-    }
-  };
-
+  remoteStreams[participantId] = new MediaStream();
+  displayRemoteStream(participantId, participantName);
   // Handle incoming tracks
   peerConnection.ontrack = (event) => {
-    const remoteStream = event.streams[0];
-    displayRemoteStream(participantId, participantName, remoteStream);
+    event.streams[0].getTracks().forEach((track) => {
+      remoteStreams[participantId].addTrack(track);
+    });
   };
 
   // Create and send an offer
-  peerConnection
+  await peerConnection
     .createOffer()
     .then((offer) => peerConnection.setLocalDescription(offer))
     .then(() => {
       connection
         .invoke(
           "SendOffer",
-          roomId,
+          webRTCRoomId,
           participantId,
           JSON.stringify(peerConnection.localDescription)
         )
@@ -122,7 +104,7 @@ connection.on("participantJoined", (participantId, participantName) => {
 });
 
 // Handle received offer from other participants
-connection.on("receiveOffer", (senderId, senderName, offerData) => {
+connection.on("receiveOffer", async (senderId, senderName, offerData) => {
   console.log(`Received offer from ${senderName}`);
 
   const offer = JSON.parse(offerData);
@@ -134,36 +116,26 @@ connection.on("receiveOffer", (senderId, senderName, offerData) => {
     peerConnection.addTrack(track, localStream);
   });
 
-  // Set up ICE candidate handling
-  peerConnection.onicecandidate = (event) => {
-    if (event.candidate) {
-      connection
-        .invoke(
-          "SendIceCandidate",
-          roomId,
-          senderId,
-          JSON.stringify(event.candidate)
-        )
-        .catch((err) => console.error("Error sending ICE candidate:", err));
-    }
-  };
+  remoteStreams[senderId] = new MediaStream();
+  displayRemoteStream(senderId, senderName);
 
   // Handle incoming tracks
   peerConnection.ontrack = (event) => {
-    const remoteStream = event.streams[0];
-    displayRemoteStream(senderId, senderName, remoteStream);
+    event.streams[0].getTracks().forEach((track) => {
+      remoteStreams[senderId].addTrack(track);
+    });
   };
 
   // Set remote description and create answer
-  peerConnection
-    .setRemoteDescription(new RTCSessionDescription(offer))
+  await peerConnection
+    .setRemoteDescription(offer)
     .then(() => peerConnection.createAnswer())
     .then((answer) => peerConnection.setLocalDescription(answer))
     .then(() => {
       connection
         .invoke(
           "SendAnswer",
-          roomId,
+          webRTCRoomId,
           senderId,
           JSON.stringify(peerConnection.localDescription)
         )
@@ -173,28 +145,16 @@ connection.on("receiveOffer", (senderId, senderName, offerData) => {
 });
 
 // Handle received answer from other participants
-connection.on("receiveAnswer", (senderId, answerData) => {
-  console.log(`Received answer from ${senderId}`);
+connection.on("receiveAnswer", (senderId, senderName, answerData) => {
+  console.log(`Received answer from ${senderName}`);
 
   const answer = JSON.parse(answerData);
   const peerConnection = peerConnections[senderId];
 
   if (peerConnection) {
     peerConnection
-      .setRemoteDescription(new RTCSessionDescription(answer))
+      .setRemoteDescription(answer)
       .catch((err) => console.error("Error setting remote description:", err));
-  }
-});
-
-// Handle received ICE candidate from other participants
-connection.on("receiveIceCandidate", (senderId, candidateData) => {
-  const candidate = JSON.parse(candidateData);
-  const peerConnection = peerConnections[senderId];
-
-  if (peerConnection) {
-    peerConnection
-      .addIceCandidate(new RTCIceCandidate(candidate))
-      .catch((err) => console.error("Error adding ICE candidate:", err));
   }
 });
 
@@ -217,7 +177,19 @@ connection.on("participantLeft", (participantId, participantName) => {
 });
 
 // Display remote stream in the UI
-function displayRemoteStream(participantId, participantName, stream) {
+function displayRemoteStream(participantId, participantName) {
+  const stream = remoteStreams[participantId];
+  if (!stream) {
+    console.error("Stream is null or undefined");
+    return;
+  }
+
+  console.log(
+    `Displaying remote stream for participant ${participantId} (${participantName})`
+  );
+
+  console.log("Stream:", stream);
+
   const remoteVideosContainer = document.getElementById("remoteVideos");
 
   // Check if the remote video element already exists
@@ -356,10 +328,10 @@ function replaceVideoTrack(newTrack) {
 
 // Leave the room
 function leaveRoom() {
-  if (roomId) {
+  if (webRTCRoomId) {
     // Notify server that participant is leaving
     connection
-      .invoke("LeaveRoom", roomId)
+      .invoke("LeaveRoom", webRTCRoomId)
       .catch((err) => console.error("Error leaving room:", err));
 
     // Close all peer connections
