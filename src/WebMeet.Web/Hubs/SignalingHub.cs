@@ -60,6 +60,14 @@ namespace WebMeet.Web.Hubs
             }
         }
 
+        public async Task SendIceCandidate(string roomId, string recipientId, string iceData)
+        {
+            if (_rooms.TryGetValue(roomId, out var room))
+            {
+                await Clients.Client(recipientId).SendAsync("receiveIceCandidate", Context.ConnectionId, iceData);
+            }
+        }
+
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             foreach (var room in _rooms)

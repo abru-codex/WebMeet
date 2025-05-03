@@ -27,8 +27,8 @@ connection
 async function setupLocalMedia() {
   try {
     localStream = await navigator.mediaDevices.getUserMedia({
-      video: { width: 1280, height: 720 },
-      audio: false,
+      video: true,
+      audio: true,
     });
 
     const localVideo = document.getElementById("localVideo");
@@ -72,6 +72,21 @@ connection.on("participantJoined", async (participantId, participantName) => {
   const peerConnection = new RTCPeerConnection(configuration);
   peerConnections[participantId] = peerConnection;
 
+  // Add ICE candidate handling
+  peerConnection.onicecandidate = (event) => {
+    if (event.candidate) {
+      console.log(`Sending ICE candidate to ${participantName}`);
+      connection
+        .invoke(
+          "SendIceCandidate",
+          webRTCRoomId,
+          participantId,
+          JSON.stringify(event.candidate)
+        )
+        .catch((err) => console.error("Error sending ICE candidate:", err));
+    }
+  };
+
   // Add local tracks to the peer connection
   localStream.getTracks().forEach((track) => {
     peerConnection.addTrack(track, localStream);
@@ -81,7 +96,15 @@ connection.on("participantJoined", async (participantId, participantName) => {
   displayRemoteStream(participantId, participantName);
   // Handle incoming tracks
   peerConnection.ontrack = (event) => {
+    console.log(
+      `Received track from ${participantId}:`,
+      event.track.kind,
+      event.streams[0]
+    ); // Add this log
     event.streams[0].getTracks().forEach((track) => {
+      console.log(
+        `Adding track ${track.id} (${track.kind}) to remote stream ${participantId}`
+      ); // Add this log
       remoteStreams[participantId].addTrack(track);
     });
   };
@@ -111,6 +134,21 @@ connection.on("receiveOffer", async (senderId, senderName, offerData) => {
   const peerConnection = new RTCPeerConnection(configuration);
   peerConnections[senderId] = peerConnection;
 
+  // Add ICE candidate handling
+  peerConnection.onicecandidate = (event) => {
+    if (event.candidate) {
+      console.log(`Sending ICE candidate to ${senderName}`);
+      connection
+        .invoke(
+          "SendIceCandidate",
+          webRTCRoomId,
+          senderId,
+          JSON.stringify(event.candidate)
+        )
+        .catch((err) => console.error("Error sending ICE candidate:", err));
+    }
+  };
+
   // Add local tracks to the peer connection
   localStream.getTracks().forEach((track) => {
     peerConnection.addTrack(track, localStream);
@@ -121,7 +159,15 @@ connection.on("receiveOffer", async (senderId, senderName, offerData) => {
 
   // Handle incoming tracks
   peerConnection.ontrack = (event) => {
+    console.log(
+      `Received track from ${senderId}:`,
+      event.track.kind,
+      event.streams[0]
+    ); // Add this log
     event.streams[0].getTracks().forEach((track) => {
+      console.log(
+        `Adding track ${track.id} (${track.kind}) to remote stream ${senderId}`
+      ); // Add this log
       remoteStreams[senderId].addTrack(track);
     });
   };
@@ -155,6 +201,22 @@ connection.on("receiveAnswer", (senderId, senderName, answerData) => {
     peerConnection
       .setRemoteDescription(answer)
       .catch((err) => console.error("Error setting remote description:", err));
+  }
+});
+
+// Handle received ICE candidates
+connection.on("receiveIceCandidate", (senderId, iceData) => {
+  console.log(`Received ICE candidate from ${senderId}`);
+
+  const candidate = JSON.parse(iceData);
+  const peerConnection = peerConnections[senderId];
+
+  if (peerConnection) {
+    peerConnection
+      .addIceCandidate(new RTCIceCandidate(candidate))
+      .catch((err) =>
+        console.error("Error adding received ICE candidate:", err)
+      );
   }
 });
 
@@ -201,12 +263,16 @@ function displayRemoteStream(participantId, participantName) {
     // Create a new video wrapper for this participant
     const videoWrapper = document.createElement("div");
     videoWrapper.className = "video-wrapper";
+    // Ensure we add the remote-video class to the wrapper
+    videoWrapper.classList.add("remote-video");
 
     // Create a new video element
     remoteVideoElement = document.createElement("video");
     remoteVideoElement.id = `remote-video-${participantId}`;
     remoteVideoElement.autoplay = true;
     remoteVideoElement.playsInline = true;
+    // Manually set muted to false to ensure audio plays
+    remoteVideoElement.muted = false;
 
     // Create video overlay with participant name
     const videoOverlay = document.createElement("div");
