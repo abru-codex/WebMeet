@@ -26,7 +26,6 @@ namespace WebMeet.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Set the host ID to the current user if not already set
                 if (string.IsNullOrEmpty(model.HostId))
                 {
                     model.HostId = User.Identity.Name;

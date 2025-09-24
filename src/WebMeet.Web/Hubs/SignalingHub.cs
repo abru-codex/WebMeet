@@ -18,8 +18,6 @@ namespace WebMeet.Web.Hubs
 
             foreach (var participant in room.Where(p => p.Key != Context.ConnectionId))
             {
-                //await Clients.Caller.SendAsync("participantJoined", participant.Key, participant.Value);
-
                 await Clients.Client(participant.Key).SendAsync("participantJoined", Context.ConnectionId, userName);
             }
         }

@@ -1,68 +1,83 @@
-# Video Meeting Application
+# WebMeet
 
-## Overview
-
-The Video Meeting Application is a web-based platform that allows users to host and join video meetings. Built using ASP.NET Core MVC, this application leverages modern web technologies such as WebRTC for real-time communication and SignalR for chat functionality. The application is designed to be user-friendly and responsive, making it accessible on both desktop and mobile devices.
+A simple web-based video conferencing application built with ASP.NET Core MVC and WebRTC.
 
 ## Features
 
-- **User Authentication**: Users can sign up, log in, and join meetings as guests.
-- **Meeting Management**: Registered users can create and manage meetings, including setting optional passwords for added security.
-- **Real-Time Communication**: Participants can engage in video and audio communication with up to 25 users in a meeting.
-- **In-Meeting Chat**: Users can send text messages during meetings, with real-time updates.
-- **Responsive Design**: The application is designed to work seamlessly across various devices.
+- **User Authentication**: Sign up, log in, and manage user accounts
+- **Meeting Creation**: Create meetings with optional passwords
+- **Video Conferencing**: Real-time video and audio communication using WebRTC
+- **Live Chat**: In-meeting chat functionality powered by SignalR
+- **Responsive Design**: Works on desktop and mobile devices
 
 ## Technology Stack
 
-- **Frontend**: ASP.NET Core MVC with Razor views and Bootstrap for styling.
-- **Backend**: ASP.NET Core for REST API and WebSocket handling.
-- **Database**: PostgreSQL for data storage, accessed via Entity Framework Core.
-- **Real-Time Communication**: WebRTC for video/audio and SignalR for chat.
-- **Deployment**: Docker Compose for local development and deployment.
+- **Framework**: ASP.NET Core 9.0 MVC
+- **Database**: SQLite with Entity Framework Core
+- **Real-Time Communication**: WebRTC for video/audio, SignalR for chat
+- **Frontend**: Razor views, Bootstrap 5, jQuery
+- **Authentication**: ASP.NET Core Identity
+
+## Prerequisites
+
+- .NET 9.0 SDK
+- SQLite
 
 ## Getting Started
 
-### Prerequisites
-
-- .NET SDK (version specified in `global.json`)
-- Docker and Docker Compose
-- PostgreSQL database
-
-### Installation
-
 1. Clone the repository:
-   ```
+   ```bash
    git clone <repository-url>
-   cd VideoMeetingApp
+   cd WebMeet
    ```
 
-2. Build and run the application using Docker Compose:
+2. Navigate to the web project:
+   ```bash
+   cd src/WebMeet.Web
    ```
-   docker-compose up --build
+
+3. Restore dependencies:
+   ```bash
+   dotnet restore
    ```
 
-3. Access the application at `http://localhost:5000`.
+4. Apply database migrations:
+   ```bash
+   dotnet ef database update
+   ```
 
-### Configuration
+5. Run the application:
+   ```bash
+   dotnet run
+   ```
 
-- Update the `appsettings.json` file to configure the database connection string and other settings as needed.
+6. Access the application at `https://localhost:5001` or `http://localhost:5000`
 
-## Running Tests
+## Configuration
 
-To run the unit tests for the application, navigate to the `src/VideoMeeting.Tests` directory and execute:
+The application uses SQLite by default. Configuration can be modified in `appsettings.json`:
+
+- `ConnectionStrings:DefaultConnection`: Database connection string
+- `Jwt`: JWT configuration for token authentication (if needed)
+
+## Project Structure
+
 ```
-dotnet test
+WebMeet/
+├── src/
+│   └── WebMeet.Web/         # Main web application
+│       ├── Controllers/     # MVC controllers
+│       ├── Models/          # Data models and view models
+│       ├── Views/           # Razor views
+│       ├── Data/            # Database context and repositories
+│       ├── Services/        # Business logic services
+│       ├── Hubs/            # SignalR hubs
+│       └── wwwroot/         # Static files (CSS, JS, images)
+├── docker-compose.yml       # Docker configuration (optional)
+└── Dockerfile              # Docker image configuration
+
 ```
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Inspired by various video conferencing solutions.
-- Thanks to the open-source community for their contributions to the technologies used in this project.
+This project is licensed under the MIT License.
