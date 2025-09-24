@@ -1,6 +1,6 @@
 # WebMeet
 
-A simple web-based video conferencing application built with ASP.NET Core MVC and WebRTC.
+A simple web-based video conferencing application built with .NET and WebRTC.
 
 ## Features
 
